@@ -44,6 +44,9 @@ app.get('/', (req,res) =>{
 	res.render('home.hbs',{} );
 });
 
+app.use((req,res,next) =>{
+	res.render('error.hbs');
+});
 
 app.listen(port, () =>{
 	console.log(`Server is up at ${port}`);
