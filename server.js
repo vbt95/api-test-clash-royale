@@ -33,7 +33,7 @@ var options = {
 
 app.get('/update', (req,res) =>{
 	
-	client.query('CREATE TABLE IF NOT EXISTS users.vip(id integer);', (err, res2) => {
+	client.query('CREATE TABLE IF NOT EXISTS players(id integer);', (err, res2) => {
 		if (err) throw err;
 	client.end();
 	});
