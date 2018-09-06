@@ -32,6 +32,17 @@ var options = {
 }
 
 app.get('/update', (req,res) =>{
+	
+	client.query('CREATE TABLE IF NOT EXISTS users.vip(id integer);', (err, res) => {
+		if (err) throw err;
+		for (let row of res.rows) {
+			console.log(JSON.stringify(row));
+		}
+		//res1.render(res.rows);
+	client.end();
+	});
+	
+	
 	request(options, (error,response,body) =>{
 	if(error)
 		res.send(error);
@@ -51,16 +62,16 @@ app.get('/update', (req,res) =>{
 app.get('/view',(req,res) =>{
 	
 	queryAll(res);
-	//res.send(
+	res.send('done');
 });
 
 var queryAll= (res1) =>{
 	client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
-		if (err) res1.render('error.hbs');
+		if (err) throw err;
 		for (let row of res.rows) {
 			console.log(JSON.stringify(row));
 		}
-		res1.render(res.rows);
+		//res1.render(res.rows);
 	client.end();
 	});
 }
