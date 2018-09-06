@@ -5,11 +5,11 @@ const { Client } = require('pg');
 
 const port = process.env.PORT || 3000;
 
-/*const client = new Client({
+const client = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: true,
 });
-client.connect();*/
+client.connect();
 
 var app = express();
 
