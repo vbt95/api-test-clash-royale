@@ -88,16 +88,13 @@ var checkTable = () =>{
 	return;
 };
 
-var insertFirst = (body,ISO) =>{
-	const insertQuery = {
-		text : `INSERT INTO month${ISO.month} (tag,name) 
-		SELECT ($1,$2)
+var insertFirst = (item,ISO) =>{
+		
+	client.query( `INSERT INTO month${ISO.month} (tag,name) 
+		SELECT (${item.tag},${item.name})
 		WHERE NOT EXISTS(
-		SELECT 1 FROM month${ISO.month} WHERE tag=$1
-		);`
-		,values : [item.tag,item.name]
-	};
-	client.query( insertQuery, (err,res) =>{
+		SELECT 1 FROM month${ISO.month} WHERE tag=${item.tag}
+		);`, (err,res) =>{
 		if(err)
 			return err;
 		client.end();
