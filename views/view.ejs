@@ -1,6 +1,7 @@
 <head>
 <title> Testing </title>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<% include ../partials/header %>
 </head>
 
 <body>
@@ -10,17 +11,18 @@
 					<thead class="thead-inverse">
 						<tr>
 							<th>#</th>
-							<th>Tag</th>
 							<th>Name</th>
-							<th>Week1 given</th>
-							<th>Week1 received</th>
-							<th>Week2 given</th>
-							<th>Week2 received</th>
-							<th>Week3 received</th>
-							<th>Week4 received</th>
-							<th>Week4 received</th>
-							<th>Week5 received</th>
-							<th>Week5 received</th>
+							<th>Tage</th>
+							<th>Week 1 given</th>
+							<th>Week 1 received</th>
+							<th>Week 2 given</th>
+							<th>Week 2 received</th>
+							<th>Week 3 given</th>
+							<th>Week 3 received</th>
+							<th>Week 4 given</th>
+							<th>Week 4 received</th>
+							<th>Week 5 given</th>
+							<th>Week 5 received</th>
 						</tr>
 					</thead>
 					
@@ -28,7 +30,7 @@
 					<% rows.forEach((player) => {%>
 					<tr>
 						<td><%= player.sr %></td>
-						<td><%= player.tag %></td>
+						<td><%= player.name %></td>
 						<td><%= player.tag %></td>
 						<td><%= player.week1given %></td>
 						<td><%= player.week1received %></td>
