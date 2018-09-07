@@ -65,9 +65,10 @@ var checkTable = (body) =>{
 	week4Given integer DEFAULT 0,week4Received integer DEFAULT 0,
 	week5Given integer DEFAULT 0, week5Received integer DEFAULT 0,
 	totalDonationsGiven integer DEFAULT 0, totalDonationsReceived integer DEFAULT 0);`
-	, (err, res2) => {
+	, (err, res) => {
 		if (err) return err;
 		//flag = true;
+	console.log(res);
 	client.end();
 	return alter1(body,ISO);
 	});
@@ -76,8 +77,9 @@ var checkTable = (body) =>{
 var alter1 =(body,ISO) =>{
 	
 	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsGiven AS (week1Given+week2Given+week3Given+week4Given+week5Given) PERSISTED;'
-	,(err,res2)  =>{
+	,(err,res)  =>{
 		if(err) return err;
+		console.log(res);
 		client.end();
 		return alter2(body,ISO);
 	});
@@ -87,13 +89,13 @@ var alter1 =(body,ISO) =>{
 var alter2 = (body,ISO) =>{
 	
 	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsReceived AS (week1Received+week2Received+week3Received+week4Received+week5Received) PERSISTED;'
-	,(err,res2)  =>{
+	,(err,res)  =>{
 		if(err) return err;
+		console.log(result);
 		client.end();
+		
+		return updateFinal(body,ISO);
 	});
-	
-	//}
-	return updateFinal(body,ISO);
 };
 
 var updateFinal = (body,ISO) =>{
@@ -109,12 +111,13 @@ var updateFinal = (body,ISO) =>{
 var insertFirst = (item,ISO) =>{
 		
 	client.query( `INSERT INTO month${ISO.month} (tag,name) 
-		SELECT (${item.tag},${item.name})
+		SELECT ${item.tag},${item.name}
 		WHERE NOT EXISTS(
 		SELECT 1 FROM month${ISO.month} WHERE tag=${item.tag}
 		);`, (err,res) =>{
 		if(err)
 			return err;
+		console.log(res);
 		client.end();
 		updateOneItem(item,ISO);
 	});
@@ -127,6 +130,7 @@ var updateOneItem = (item,ISO) =>{
 		, (err,res) =>{
 			if(err)
 				return err;
+			console.log(res);
 			client.end();
 		});
 };
