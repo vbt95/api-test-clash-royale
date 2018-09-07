@@ -31,10 +31,14 @@ var options = {
 
 }
 
-var checkTable = () =>{
+var getCurrentMonth = () =>{
 	var curDate= new Date();
-	var month= curDate.getMonth();
+	return curDate.getMonth();
+}
+
+var checkTable = () =>{
 	
+	const month = getCurrentMonth();
 	client.query('CREATE TABLE IF NOT EXISTS month'+month+' (id integer);', (err, res2) => {
 		if (err) throw err;
 	client.end();
@@ -43,9 +47,7 @@ var checkTable = () =>{
 
 app.get('/update', (req,res) =>{
 	
-	
 	checkTable();
-	
 	
 	request(options, (error,response,body) =>{
 	if(error)
@@ -58,24 +60,25 @@ app.get('/update', (req,res) =>{
 		res.send(body);
 	}
 	//res.send('done');
-	
-
 });
 });
 
 app.get('/view',(req,res) =>{
 	
-	queryAll(res);
-	res.send('done');
+	var result = queryAll();
+	res.send(result);
 });
 
-var queryAll= (res1) =>{
-	client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
-		if (err) throw err;
-		for (let row of res.rows) {
+var queryAll= () =>{
+	const month = getCurrentMonth();
+	
+	client.query('SELECT * FROM month'+month, (err, res) => {
+		if (err) return;
+		/*for (let row of res.rows) {
 			console.log(JSON.stringify(row));
-		}
+		}*/
 		//res1.render(res.rows);
+		return res;
 	client.end();
 	});
 }
