@@ -80,16 +80,16 @@ var checkTable = () =>{
 }
 
 var updateFinal = (body,ISO) =>{
+	let status;
 	body.members.forEach( (item) => {
-		let statusInsert = updateOne(item,ISO);
+	/*	let statusInsert = updateOne(item,ISO);
 		if(statusInsert)
 			return statusInsert;
 })
 };
 
 var updateOne = (item,ISO) =>{
-	
-	let status;
+	let status;*/
 	pool.connect( (err,client,done) =>{
 		
 		if(err){
@@ -118,7 +118,7 @@ var updateOne = (item,ISO) =>{
 						WHERE tag = $3;` 
 						, 
 						[item.donations,item.donationsReceived,item.tag]
-						,(err,res,done) =>{
+						,(err,res) =>{
 							if(err){
 								console.log(err);
 								status = err;
@@ -153,7 +153,8 @@ var updateOne = (item,ISO) =>{
 		});
 		}
 	});
-	return status;
+});
+return status;
 }
 
 var updateRecords = (body)=>{
