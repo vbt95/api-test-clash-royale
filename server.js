@@ -222,7 +222,7 @@ app.get('/view',(req,res) =>{
 		}
 		else
 		{			
-		client.query(`SELECT * FROM month${ISO.month};`, (err, res) => {
+		client.query(`SELECT * FROM month${ISO.month};`, (err, result) => {
 			if (err) {
 				console.log(error);
 				done();
@@ -232,8 +232,10 @@ app.get('/view',(req,res) =>{
 			console.log(JSON.stringify(row));
 		}*/
 		//res1.render(res.rows);
+		else{
 			done();
-			return res;
+			res.send(result);
+		}
 		});
 		}
 	});
