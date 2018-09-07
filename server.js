@@ -8,7 +8,11 @@ const port = process.env.PORT || 3000;
 
 // database connection
 const { Pool } = require('pg')
-const pool = new Pool()
+const pool = new Pool({
+connectionString: process.env.DATABASE_URL,
+  ssl: true,
+}
+)
 
 var app = express();
 
