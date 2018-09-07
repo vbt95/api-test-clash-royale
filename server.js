@@ -79,25 +79,6 @@ var checkTable = () =>{
 	});
 }
 
-var alter1 =(body,ISO) =>{
-	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsGiven AS (week1Given+week2Given+week3Given+week4Given+week5Given) PERSISTED;'
-	,(err,res)  =>{
-		if(err) return err;
-		console.log('alter1 execution over');
-		return alter2(body,ISO);
-		client.end();
-	});
-}
-var alter2 = (body,ISO) =>{
-	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsReceived AS (week1Received+week2Received+week3Received+week4Received+week5Received) PERSISTED;'
-	,(err,res)  =>{
-		if(err) return err;
-		console.log('alter2 execution over');
-		return updateFinal(body,ISO);
-		client.end();
-	});
-};
-
 var updateFinal = (body,ISO) =>{
 	body.members.forEach( (item) => {
 		let statusInsert = updateOne(item,ISO);
@@ -108,61 +89,71 @@ var updateFinal = (body,ISO) =>{
 
 var updateOne = (item,ISO) =>{
 	
+	let status;
 	pool.connect( (err,client,done) =>{
 		
 		if(err){
 			console.log(err);
+			status = err;
 			done();
-			return err;
-		}	
-	client.query( `SELECT tag FROM month${ISO.month} WHERE tag=$1;`
-		,[item.tag]
-		, (err,res) =>{
-		
-		if(err){
-			console.log(err);
-			done();
-			return err;
 		}
-		console.log('insertFirst execution over');
-		
-		if(res.rowCount  > 0){
-			console.log('Exists');
-			client.query( `UPDATE month{ISO.month} SET week${ISO.week}Given = $1,
-					week${ISO.week}Received = $2
-					WHERE tag = $3;` 
-				, 
-				[item.donations,item.donationsReceived,item.tag]
-				,(err,res) =>{
-					if(err){
-						console.log(err);
-						done();
-						return err;
-					}
-				console.log('updated one item');
-				done();
-				return;
-			});
-		}
-		else
-		{
-			console.log('Not exists');
-			client.query(`INSERT into month${ISO.month} (tag,name,week${ISO.week}Given,week${ISO.week}Received)
-				VALUES ($1,$2,$3,$4); `
-			,[item.tag,item.name,item.donations,item.donationsReceived]
+		else{
+		client.query( `SELECT tag FROM month${ISO.month} WHERE tag=$1;`
+			,[item.tag]
 			, (err,res) =>{
-				if(err){
-					console.log(err);
-					done();
-					return err;
-				}
-				console.log('Inserted it');
+		
+			if(err){
+				console.log(err);
+				status = err;
 				done();
-				return;
-			});
-		}
+			}
+			else{
+		
+				console.log('checking for existence over');
+		
+				if(res.rowCount  > 0){
+					console.log('Exists');
+					client.query( `UPDATE month{ISO.month} SET week${ISO.week}Given = $1,
+						week${ISO.week}Received = $2
+						WHERE tag = $3;` 
+						, 
+						[item.donations,item.donationsReceived,item.tag]
+						,(err,res,done) =>{
+							if(err){
+								console.log(err);
+								status = err;
+								done();
+							
+							}
+							else{
+								console.log('updated one item');
+								done();
+							}
+					});// update query over
+				}
+				else
+				{
+					console.log('Not exists');
+					client.query(`INSERT into month${ISO.month} (tag,name,week${ISO.week}Given,week${ISO.week}Received)
+							VALUES ($1,$2,$3,$4); `
+							,[item.tag,item.name,item.donations,item.donationsReceived]
+							, (err,res) =>{
+									if(err){
+									console.log(err);
+									done();
+									status = err;
+								}
+								else{
+									console.log('Inserted it');
+									done();
+								}
+					});// insert query over
+				}
+			}
 		});
+		}
 	});
+	return status;
 }
 
 var updateRecords = (body)=>{
