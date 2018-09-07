@@ -217,14 +217,20 @@ app.get('/view',(req,res) =>{
 var queryMonthly= () =>{
 	const ISO= getISOWeekInMonth(new Date());
 	
+	pool.connect( (err,client,done) =>{
+		
 	client.query(`SELECT * FROM month${ISO.month};`, (err, res) => {
-		if (err) return;
+		if (err) {
+			console.log(error);
+			return done();
+		}
 		/*for (let row of res.rows) {
 			console.log(JSON.stringify(row));
 		}*/
 		//res1.render(res.rows);
+		done();
 		return res;
-	client.end();
+	});
 	});
 }
 
