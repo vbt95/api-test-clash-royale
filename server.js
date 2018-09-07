@@ -142,7 +142,7 @@ app.get('/update', (req,res) =>{
 	if(error)
 		res.render('error.hbs',{message : error});
 	else if(response.statusCode !== 200){
-		res.render('error.hbs', {message : statusCode});
+		res.render('error.hbs', {message : response.statusCode});
 	}
 	else{
 		//console.log(JSON.stringify(body,undefined,2));
