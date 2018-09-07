@@ -98,7 +98,7 @@ var updateOne = (item,ISO) =>{
 			done();
 		}
 		else{
-		client.query( `SELECT tag FROM month${ISO.month} WHERE tag=$1;`
+		client.query( `SELECT * FROM month${ISO.month} WHERE tag = $1;`
 			,[item.tag]
 			, (err,res) =>{
 		
@@ -113,7 +113,7 @@ var updateOne = (item,ISO) =>{
 		
 				if(res.rowCount  > 0){
 					console.log('Exists');
-					client.query( `UPDATE month{ISO.month} SET week${ISO.week}Given = $1,
+					client.query( `UPDATE month${ISO.month} SET week${ISO.week}Given = $1,
 						week${ISO.week}Received = $2
 						WHERE tag = $3;` 
 						, 
