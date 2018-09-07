@@ -219,10 +219,16 @@ var queryMonthly= () =>{
 	
 	pool.connect( (err,client,done) =>{
 		
+		if(err){
+			res.render('error.hbs', {message : err});
+		}
+		else
+		{			
 	client.query(`SELECT * FROM month${ISO.month};`, (err, res) => {
 		if (err) {
 			console.log(error);
-			return done();
+			done();
+			res.render('error.hbs' ,{message : err});
 		}
 		/*for (let row of res.rows) {
 			console.log(JSON.stringify(row));
@@ -230,7 +236,8 @@ var queryMonthly= () =>{
 		//res1.render(res.rows);
 		done();
 		return res;
-	});
+		});
+		}
 	});
 }
 
