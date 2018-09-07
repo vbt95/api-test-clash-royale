@@ -112,15 +112,15 @@ var updateRecords = (body)=>{
 		if(statusInsert)
 			return statusInsert;
 		
-		const updateQuery = {
-			text : `UPDATE month{ISO.month} SET week${ISO.week}Given = $1,
-					week${ISO.week}Received = $2
-					WHERE tag = $3
-			;`
+		/*const updateQuery = {
+			text : 
 			, values : [item.donations, item.donationsReceived, item.tag]
-		};
+		};*/
 		
-		client.query( updateQuery , (err,res) =>{
+		client.query( `UPDATE month{ISO.month} SET week${ISO.week}Given = ${item.donations},
+					week${ISO.week}Received = ${item.donationsReceived}
+					WHERE tag = ${item.tag};` 
+		, (err,res) =>{
 			if(err)
 				return err;
 			client.end();
