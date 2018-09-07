@@ -67,24 +67,24 @@ var checkTable = (body) =>{
 	totalDonationsGiven int DEFAULT 0, totalDonationsReceived int DEFAULT 0);`
 	, (err, res2) => {
 		if (err) return err;
-		flag = true;
+		//flag = true;
 	client.end();
-	return alter1(body);
+	return alter1(body,ISO);
 	});
 };
 
-var alter1 =(body) =>{
+var alter1 =(body,ISO) =>{
 	
 	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsGiven AS (week1Given+week2Given+week3Given+week4Given+week5Given) PERSISTED;'
 	,(err,res2)  =>{
 		if(err) return err;
 		client.end();
-		return alter2(body);
+		return alter2(body,ISO);
 	});
 	
 }
 
-var alter2 = (body) =>{
+var alter2 = (body,ISO) =>{
 	
 	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsReceived AS (week1Received+week2Received+week3Received+week4Received+week5Received) PERSISTED;'
 	,(err,res2)  =>{
@@ -93,12 +93,12 @@ var alter2 = (body) =>{
 	});
 	
 	//}
-	return updateFinal(body);
+	return updateFinal(body,ISO);
 };
 
-var updateFinal = (body) =>{
+var updateFinal = (body,ISO) =>{
 	body.members.forEach( (item) => {
-		const ISO = getISOWeekInMonth(new Date());
+		//const ISO = getISOWeekInMonth(new Date());
 		
 		const statusInsert = insertFirst(item,ISO);
 		if(statusInsert)
