@@ -103,37 +103,45 @@ var updateFinal = (body,ISO) =>{
 		//const ISO = getISOWeekInMonth(new Date());
 		
 		const statusInsert = insertFirst(item,ISO);
-		if(statusInsert)
-			return statusInsert;
+		//if(statusInsert)
+			//return statusInsert;
 })
 };
 
 var insertFirst = (item,ISO) =>{
 		
 	client.query( `INSERT INTO month${ISO.month} (tag,name) 
-		SELECT ${item.tag},${item.name}
+		SELECT $1,$2
 		WHERE NOT EXISTS(
-		SELECT 1 FROM month${ISO.month} WHERE tag=${item.tag}
-		);`, (err,res) =>{
-		if(err)
-			return err;
+		SELECT 1 FROM month${ISO.month} WHERE tag=$1
+		);`
+		,[item.tag,item.name]
+		, (err,res) =>{
+		if(err){
+			console.log(err);
+			return done();
+		}
 		console.log('insertFirst execution over');
-		client.end();
+		return done();
 	});
 	
-	var status = updateOneItem(item,ISO);
-	return status;
+	///var status = updateOneItem(item,ISO);
+	//return status;
 };
 
 var updateOneItem = (item,ISO) =>{		
-		client.query( `UPDATE month{ISO.month} SET week${ISO.week}Given = ${item.donations},
-					week${ISO.week}Received = ${item.donationsReceived}
-					WHERE tag = ${item.tag};` 
-		, (err,res) =>{
-			if(err)
-				return err;
+		client.query( `UPDATE month{ISO.month} SET week${ISO.week}Given = $1,
+					week${ISO.week}Received = $2
+					WHERE tag = $3;` 
+		, 
+		[item.donations,item.donationsReceived,item.tag]
+		,(err,res) =>{
+			if(err){
+				console.log(err);
+				return done();
+			}
 			console.log('updated one item');
-			client.end();
+			return done();
 		});
 };
 
