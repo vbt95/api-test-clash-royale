@@ -117,6 +117,8 @@ var updateOne = (item,ISO) =>{
 	pool.connect( (err,client,done) =>{
 		if(err){
 			console.log(err);
+			done();
+			return err;
 		}
 			
 	client.query( `SELECT tag FROM month${ISO.month} WHERE tag=$1;`
@@ -125,7 +127,8 @@ var updateOne = (item,ISO) =>{
 		//done();
 		if(err){
 			console.log(err);
-			return done();
+			done();
+			return err;
 		}
 		console.log('insertFirst execution over');
 		
@@ -139,7 +142,8 @@ var updateOne = (item,ISO) =>{
 				,(err,res) =>{
 					if(err){
 						console.log(err);
-						return done();
+						done();
+						return err;
 					}
 				console.log('updated one item');
 				return done();
@@ -154,7 +158,8 @@ var updateOne = (item,ISO) =>{
 			, (err,res) =>{
 				if(err){
 					console.log(err);
-					return done();
+					done();
+					return err;
 				}
 				console.log('Inserted it');
 				return done();
@@ -185,8 +190,6 @@ app.get('/update', (req,res) =>{
 	else{
 		//console.log(JSON.stringify(body,undefined,2));
 		
-		
-		
 		const statusUpdate = updateRecords(body);
 		if(statusUpdate){
 			res.render('error.hbs', {message : statusUpdate});
@@ -209,37 +212,32 @@ app.get('/setForCurrentMonth' ,(req,res) =>{
 // View current month records
 app.get('/view',(req,res) =>{
 	
-	var result = queryMonthly();
-	res.send(result);
-});
-
-// query all records for current month
-var queryMonthly= () =>{
 	const ISO= getISOWeekInMonth(new Date());
 	
 	pool.connect( (err,client,done) =>{
 		
 		if(err){
 			res.render('error.hbs', {message : err});
+			return done();
 		}
 		else
 		{			
-	client.query(`SELECT * FROM month${ISO.month};`, (err, res) => {
-		if (err) {
-			console.log(error);
-			done();
-			res.render('error.hbs' ,{message : err});
-		}
+		client.query(`SELECT * FROM month${ISO.month};`, (err, res) => {
+			if (err) {
+				console.log(error);
+				done();
+				res.render('error.hbs' ,{message : err});
+			}
 		/*for (let row of res.rows) {
 			console.log(JSON.stringify(row));
 		}*/
 		//res1.render(res.rows);
-		done();
-		return res;
+			done();
+			return res;
 		});
 		}
 	});
-}
+});
 
 
 
