@@ -53,7 +53,7 @@ var getISOWeekInMonth= (date) =>{
 }
 
 // check if table exists and if not then create it
-var checkTable = () =>{
+var checkTable = (body) =>{
 	
 	const ISO = getISOWeekInMonth(new Date());
 	//let flag=false;
@@ -69,14 +69,22 @@ var checkTable = () =>{
 		if (err) return err;
 		flag = true;
 	client.end();
+	return alter1(body);
 	});
+};
+
+var alter1 =(body) =>{
 	
-	//if(!flag){
 	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsGiven AS (week1Given+week2Given+week3Given+week4Given+week5Given) PERSISTED;'
 	,(err,res2)  =>{
 		if(err) return err;
 		client.end();
+		return alter2(body);
 	});
+	
+}
+
+var alter2 = (body) =>{
 	
 	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsReceived AS (week1Received+week2Received+week3Received+week4Received+week5Received) PERSISTED;'
 	,(err,res2)  =>{
@@ -85,7 +93,17 @@ var checkTable = () =>{
 	});
 	
 	//}
-	return;
+	return updateFinal(body);
+};
+
+var updateFinal = (body) =>{
+	body.members.forEach( (item) => {
+		const ISO = getISOWeekInMonth(new Date());
+		
+		const statusInsert = insertFirst(item,ISO);
+		if(statusInsert)
+			return statusInsert;
+})
 };
 
 var insertFirst = (item,ISO) =>{
@@ -98,22 +116,11 @@ var insertFirst = (item,ISO) =>{
 		if(err)
 			return err;
 		client.end();
+		updateOneItem(item,ISO);
 	});
 };
 
-var updateRecords = (body)=>{
-	body.members.forEach( (item) => {
-		const ISO = getISOWeekInMonth(new Date());
-		
-		const statusInsert = insertFirst(item,ISO);
-		if(statusInsert)
-			return statusInsert;
-		
-		/*const updateQuery = {
-			text : 
-			, values : [item.donations, item.donationsReceived, item.tag]
-		};*/
-		
+var updateOneItem = (item,ISO) =>{		
 		client.query( `UPDATE month{ISO.month} SET week${ISO.week}Given = ${item.donations},
 					week${ISO.week}Received = ${item.donationsReceived}
 					WHERE tag = ${item.tag};` 
@@ -122,17 +129,17 @@ var updateRecords = (body)=>{
 				return err;
 			client.end();
 		});
-	});
+};
+
+var updateRecords = (body)=>{
 	
+	let status = checkTable(body);
+	if(status){
+			return status;
+	}
 };
 
 app.get('/update', (req,res) =>{
-	
-	let status = checkTable();
-	if(status){
-			res.render('error.hbs',{message : status});
-			return ;
-	}
 	
 	// Request data from RoyaleAPI
 	request(options, (error,response,body) =>{
@@ -143,6 +150,8 @@ app.get('/update', (req,res) =>{
 	}
 	else{
 		//console.log(JSON.stringify(body,undefined,2));
+		
+		
 		
 		const statusUpdate = updateRecords(body);
 		if(statusUpdate){
