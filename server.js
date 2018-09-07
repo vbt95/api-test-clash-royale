@@ -63,9 +63,10 @@ var checkTable = (body) =>{
 	week2Given integer DEFAULT 0,week2Received integer	DEFAULT 0, 
 	week3Given integer DEFAULT 0,week3Received integer DEFAULT 0,
 	week4Given integer DEFAULT 0,week4Received integer DEFAULT 0,
-	week5Given integer DEFAULT 0, week5Received integer DEFAULT 0,
-	totalDonationsGiven AS week1Given+week2Given+week3Given+week4Given+week5Given, 
-	totalDonationsReceived AS week1Received+week2Received+week3Received+week4Received+week5Received);`
+	week5Given integer DEFAULT 0, week5Received integer DEFAULT 0);`
+	//totalDonationsGiven AS week1Given+week2Given+week3Given+week4Given+week5Given, 
+	//totalDonationsReceived AS week1Received+week2Received+week3Received+week4Received+week5Received
+	//);
 	, (err, res) => {
 		if (err) return err;
 		//flag = true;
