@@ -1,7 +1,5 @@
 const request = require('request');
 const express= require('express');
-const hbs = require('hbs');
-//const { Client } = require('pg');
 
 // get PORT number from heroku or 3000 if testing on local machine
 const port = process.env.PORT || 3000;
@@ -16,13 +14,12 @@ connectionString: process.env.DATABASE_URL,
 
 var app = express();
 
-// set view and partials
-hbs.registerPartials(__dirname+'/views/partials');
-app.set('view engine','hbs');
+// set view engine
+app.set('view engine','ejs');
 
 // For maintenance mode
 /*app.use((req,res,next) =>{
-	res.render('maintenance.hbs');
+	res.render('maintenance');
 });*/
 
 // Options for HTTP request to API
@@ -35,7 +32,6 @@ var options = {
 	, json : true
 
 }
-
 
 /* Get ISO week in month, based on first Monday in month
 ** @param {Date} date - date to get week in month of
@@ -104,27 +100,25 @@ var alter2 = (body,ISO) =>{
 
 var updateFinal = (body,ISO) =>{
 	body.members.forEach( (item) => {
-		//const ISO = getISOWeekInMonth(new Date());
-		
-		const statusInsert = updateOne(item,ISO);
-		//if(statusInsert)
-			//return statusInsert;
+		let statusInsert = updateOne(item,ISO);
+		if(statusInsert)
+			return statusInsert;
 })
 };
 
 var updateOne = (item,ISO) =>{
 	
 	pool.connect( (err,client,done) =>{
+		
 		if(err){
 			console.log(err);
 			done();
 			return err;
-		}
-			
+		}	
 	client.query( `SELECT tag FROM month${ISO.month} WHERE tag=$1;`
 		,[item.tag]
 		, (err,res) =>{
-		//done();
+		
 		if(err){
 			console.log(err);
 			done();
@@ -146,7 +140,8 @@ var updateOne = (item,ISO) =>{
 						return err;
 					}
 				console.log('updated one item');
-				return done();
+				done();
+				return;
 			});
 		}
 		else
@@ -162,7 +157,8 @@ var updateOne = (item,ISO) =>{
 					return err;
 				}
 				console.log('Inserted it');
-				return done();
+				done();
+				return;
 			});
 		}
 		});
@@ -183,16 +179,16 @@ app.get('/update', (req,res) =>{
 	// Request data from RoyaleAPI
 	request(options, (error,response,body) =>{
 	if(error)
-		res.render('error.hbs',{message : error});
+		res.render('error',{message : error});
 	else if(response.statusCode !== 200){
-		res.render('error.hbs', {message : response.statusCode});
+		res.render('error', {message : response.statusCode});
 	}
 	else{
 		//console.log(JSON.stringify(body,undefined,2));
 		
 		const statusUpdate = updateRecords(body);
 		if(statusUpdate){
-			res.render('error.hbs', {message : statusUpdate});
+			res.render('error', {message : statusUpdate});
 			return;
 		}
 		res.send('Successfully updated');
@@ -204,7 +200,7 @@ app.get('/update', (req,res) =>{
 app.get('/setForCurrentMonth' ,(req,res) =>{
 	let status = checkTable();
 	if(status)
-		res.render('error.hbs', {message : status});
+		res.render('error', {message : status});
 	else
 		res.send('Done');
 });
@@ -217,7 +213,7 @@ app.get('/view',(req,res) =>{
 	pool.connect( (err,client,done) =>{
 		
 		if(err){
-			res.render('error.hbs', {message : err});
+			res.render('error', {message : err});
 			return done();
 		}
 		else
@@ -226,7 +222,7 @@ app.get('/view',(req,res) =>{
 			if (err) {
 				console.log(error);
 				done();
-				res.render('error.hbs' ,{message : err});
+				res.render('error' ,{message : err});
 			}
 		/*for (let row of res.rows) {
 			console.log(JSON.stringify(row));
@@ -234,7 +230,7 @@ app.get('/view',(req,res) =>{
 		//res1.render(res.rows);
 		else{
 			done();
-			res.send(result);
+			res.render('view',result);
 		}
 		});
 		}
@@ -245,12 +241,12 @@ app.get('/view',(req,res) =>{
 
 // Home page
 app.get('/', (req,res) =>{
-	res.render('home.hbs',{} );
+	res.render('home',{} );
 });
 
 // Error for any other non-supported page
 app.use((req,res,next) =>{
-	res.render('error.hbs',{message : 'Error 404! Not found page'});
+	res.render('error',{message : 'Error 404! Not found page'});
 });
 
 // start listening at port

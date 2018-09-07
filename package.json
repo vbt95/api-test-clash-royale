@@ -13,8 +13,8 @@
   "author": "Vaibhav",
   "license": "ISC",
   "dependencies": {
+    "ejs": "^2.6.1",
     "express": "^4.16.3",
-    "hbs": "^4.0.1",
     "pg": "^7.4.3",
     "request": "^2.88.0"
   }
