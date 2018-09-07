@@ -64,43 +64,39 @@ var checkTable = (body) =>{
 	week3Given integer DEFAULT 0,week3Received integer DEFAULT 0,
 	week4Given integer DEFAULT 0,week4Received integer DEFAULT 0,
 	week5Given integer DEFAULT 0, week5Received integer DEFAULT 0,
-	totalDonationsGiven integer DEFAULT 0, totalDonationsReceived integer DEFAULT 0);`
+	totalDonationsGiven AS week1Given+week2Given+week3Given+week4Given+week5Given, 
+	totalDonationsReceived AS week1Received+week2Received+week3Received+week4Received+week5Received);`
 	, (err, res) => {
 		if (err) return err;
 		//flag = true;
 	//console.log(res);
 	console.log('Inside checktable execution over');
 	
-	let statusAlter = alter1(body,ISO);
-	return statusAlter;
+	//let statusAlter = alter1(body,ISO);
+	//return statusAlter;
 	
+	let status = updateFinal(body,ISO);
 	client.end();
+	
+	return status;
 	});
 };
 
 var alter1 =(body,ISO) =>{
-	
 	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsGiven AS (week1Given+week2Given+week3Given+week4Given+week5Given) PERSISTED;'
 	,(err,res)  =>{
 		if(err) return err;
 		console.log('alter1 execution over');
-		
 		return alter2(body,ISO);
-		
 		client.end();
 	});
-	
 }
-
 var alter2 = (body,ISO) =>{
-	
 	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsReceived AS (week1Received+week2Received+week3Received+week4Received+week5Received) PERSISTED;'
 	,(err,res)  =>{
 		if(err) return err;
 		console.log('alter2 execution over');
-		
 		return updateFinal(body,ISO);
-		
 		client.end();
 	});
 };
