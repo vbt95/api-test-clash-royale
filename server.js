@@ -139,7 +139,7 @@ var updateOneItem = (item,ISO) =>{
 
 var updateRecords = (body)=>{
 	
-	const ISO = getISOWeekInMonth();
+	const ISO = getISOWeekInMonth(new Date());
 	let status = updateFinal(body,ISO);
 	if(status){
 			return status;
@@ -176,7 +176,7 @@ app.get('/setForCurrentMonth' ,(req,res) =>{
 	if(status)
 		res.render('error.hbs', {message : status});
 	else
-		res.render('Done');
+		res.send('Done');
 });
 
 // View current month records
