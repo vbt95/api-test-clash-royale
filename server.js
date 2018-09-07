@@ -70,8 +70,11 @@ var checkTable = (body) =>{
 		//flag = true;
 	//console.log(res);
 	console.log('Inside checktable execution over');
+	
+	let statusAlter = alter1(body,ISO);
+	return statusAlter;
+	
 	client.end();
-	return alter1(body,ISO);
 	});
 };
 
@@ -81,8 +84,10 @@ var alter1 =(body,ISO) =>{
 	,(err,res)  =>{
 		if(err) return err;
 		console.log('alter1 execution over');
-		client.end();
+		
 		return alter2(body,ISO);
+		
+		client.end();
 	});
 	
 }
@@ -93,9 +98,10 @@ var alter2 = (body,ISO) =>{
 	,(err,res)  =>{
 		if(err) return err;
 		console.log('alter2 execution over');
-		client.end();
 		
 		return updateFinal(body,ISO);
+		
+		client.end();
 	});
 };
 
@@ -119,8 +125,10 @@ var insertFirst = (item,ISO) =>{
 		if(err)
 			return err;
 		console.log('insertFirst execution over');
-		client.end();
+		
 		updateOneItem(item,ISO);
+		
+		client.end();
 	});
 };
 
