@@ -75,12 +75,12 @@ var checkTable = (body) =>{
 	
 	//let statusAlter = alter1(body,ISO);
 	//return statusAlter;
+	client.end();
+	});
 	
 	let status = updateFinal(body,ISO);
-	client.end();
-	
 	return status;
-	});
+	
 };
 
 var alter1 =(body,ISO) =>{
@@ -122,11 +122,11 @@ var insertFirst = (item,ISO) =>{
 		if(err)
 			return err;
 		console.log('insertFirst execution over');
-		
-		updateOneItem(item,ISO);
-		
 		client.end();
 	});
+	
+	var status = updateOneItem(item,ISO);
+	return status;
 };
 
 var updateOneItem = (item,ISO) =>{		
