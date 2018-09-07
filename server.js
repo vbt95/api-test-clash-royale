@@ -53,7 +53,7 @@ var getISOWeekInMonth= (date) =>{
 }
 
 // check if table exists and if not then create it
-var checkTable = (body) =>{
+var checkTable = () =>{
 	
 	const ISO = getISOWeekInMonth(new Date());
 	//let flag=false;
@@ -69,18 +69,14 @@ var checkTable = (body) =>{
 	//);
 	, (err, res) => {
 		if (err) return err;
-		//flag = true;
-	//console.log(res);
-	console.log('Inside checktable execution over');
 	
+	console.log('Inside checktable execution over');
 	//let statusAlter = alter1(body,ISO);
 	//return statusAlter;
 	client.end();
 	});
-	
-	let status = updateFinal(body,ISO);
-	return status;
-	
+	//let status = updateFinal(body,ISO);
+	//return status;
 };
 
 var alter1 =(body,ISO) =>{
@@ -143,7 +139,8 @@ var updateOneItem = (item,ISO) =>{
 
 var updateRecords = (body)=>{
 	
-	let status = checkTable(body);
+	const ISO = getISOWeekInMonth();
+	let status = updateFinal(body,ISO);
 	if(status){
 			return status;
 	}
@@ -172,6 +169,14 @@ app.get('/update', (req,res) =>{
 	}
 	//res.send('done');
 });
+});
+
+app.get('/setForCurrentMonth' ,(req,res) =>{
+	let status = checkTable();
+	if(status)
+		res.render('error.hbs', {message : status});
+	else
+		res.render('Done');
 });
 
 // View current month records
