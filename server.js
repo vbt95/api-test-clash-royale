@@ -68,7 +68,8 @@ var checkTable = (body) =>{
 	, (err, res) => {
 		if (err) return err;
 		//flag = true;
-	console.log(res);
+	//console.log(res);
+	console.log('Inside checktable execution over');
 	client.end();
 	return alter1(body,ISO);
 	});
@@ -79,7 +80,7 @@ var alter1 =(body,ISO) =>{
 	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsGiven AS (week1Given+week2Given+week3Given+week4Given+week5Given) PERSISTED;'
 	,(err,res)  =>{
 		if(err) return err;
-		console.log(res);
+		console.log('alter1 execution over');
 		client.end();
 		return alter2(body,ISO);
 	});
@@ -91,7 +92,7 @@ var alter2 = (body,ISO) =>{
 	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsReceived AS (week1Received+week2Received+week3Received+week4Received+week5Received) PERSISTED;'
 	,(err,res)  =>{
 		if(err) return err;
-		console.log(result);
+		console.log('alter2 execution over');
 		client.end();
 		
 		return updateFinal(body,ISO);
@@ -117,7 +118,7 @@ var insertFirst = (item,ISO) =>{
 		);`, (err,res) =>{
 		if(err)
 			return err;
-		console.log(res);
+		console.log('insertFirst execution over');
 		client.end();
 		updateOneItem(item,ISO);
 	});
@@ -130,7 +131,7 @@ var updateOneItem = (item,ISO) =>{
 		, (err,res) =>{
 			if(err)
 				return err;
-			console.log(res);
+			console.log('updated one item');
 			client.end();
 		});
 };
