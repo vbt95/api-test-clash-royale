@@ -173,7 +173,7 @@ app.get('/view',(req,res) =>{
 
 // query all records for current month
 var queryMonthly= () =>{
-	const ISO= getISOWeekInMonth();
+	const ISO= getISOWeekInMonth(new Date());
 	
 	client.query(`SELECT * FROM month${ISO.month};`, (err, res) => {
 		if (err) return;
