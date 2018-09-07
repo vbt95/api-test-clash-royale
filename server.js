@@ -1,17 +1,14 @@
 const request = require('request');
 const express= require('express');
 const hbs = require('hbs');
-const { Client } = require('pg');
+//const { Client } = require('pg');
 
 // get PORT number from heroku or 3000 if testing on local machine
 const port = process.env.PORT || 3000;
 
 // database connection
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true,
-});
-client.connect();
+const { Pool } = require('pg')
+const pool = new Pool()
 
 var app = express();
 
@@ -57,6 +54,11 @@ var checkTable = () =>{
 	
 	const ISO = getISOWeekInMonth(new Date());
 	//let flag=false;
+	pool.connect((err,client,done ) =>{
+	
+	if(err){
+		 throw err;
+	}
 	client.query(`CREATE TABLE IF NOT EXISTS month${ISO.month} (tag varchar(20) PRIMARY KEY,
 	name varchar(30),
 	week1Given integer DEFAULT 0,week1Received integer DEFAULT 0, 
@@ -68,16 +70,14 @@ var checkTable = () =>{
 	//totalDonationsReceived AS week1Received+week2Received+week3Received+week4Received+week5Received
 	//);
 	, (err, res) => {
-		if (err) return err;
-	
-	console.log('Inside checktable execution over');
-	//let statusAlter = alter1(body,ISO);
-	//return statusAlter;
-	client.end();
+		done();
+		if (err) {
+			console.log(err);
+		}
+		console.log('Inside checktable execution over');
+		});
 	});
-	//let status = updateFinal(body,ISO);
-	//return status;
-};
+}
 
 var alter1 =(body,ISO) =>{
 	client.query('ALTER TABLE month'+ISO.month+' ADD totalDonationsGiven AS (week1Given+week2Given+week3Given+week4Given+week5Given) PERSISTED;'
@@ -102,48 +102,63 @@ var updateFinal = (body,ISO) =>{
 	body.members.forEach( (item) => {
 		//const ISO = getISOWeekInMonth(new Date());
 		
-		const statusInsert = insertFirst(item,ISO);
+		const statusInsert = updateOne(item,ISO);
 		//if(statusInsert)
 			//return statusInsert;
 })
 };
 
-var insertFirst = (item,ISO) =>{
-		
-	client.query( `INSERT INTO month${ISO.month} (tag,name) 
-		SELECT $1,$2
-		WHERE NOT EXISTS(
-		SELECT 1 FROM month${ISO.month} WHERE tag=$1
-		);`
-		,[item.tag,item.name]
+var updateOne = (item,ISO) =>{
+	
+	pool.connect( (err,client,done) =>{
+		if(err){
+			console.log(err);
+		}
+			
+	client.query( `SELECT tag FROM month${ISO.month} WHERE tag=$1;`
+		,[item.tag]
 		, (err,res) =>{
+		//done();
 		if(err){
 			console.log(err);
 			return done();
 		}
 		console.log('insertFirst execution over');
-		return done();
-	});
-	
-	///var status = updateOneItem(item,ISO);
-	//return status;
-};
-
-var updateOneItem = (item,ISO) =>{		
-		client.query( `UPDATE month{ISO.month} SET week${ISO.week}Given = $1,
+		
+		if(res.rowCount  > 0){
+			console.log('Exists');
+			client.query( `UPDATE month{ISO.month} SET week${ISO.week}Given = $1,
 					week${ISO.week}Received = $2
 					WHERE tag = $3;` 
-		, 
-		[item.donations,item.donationsReceived,item.tag]
-		,(err,res) =>{
-			if(err){
-				console.log(err);
+				, 
+				[item.donations,item.donationsReceived,item.tag]
+				,(err,res) =>{
+					if(err){
+						console.log(err);
+						return done();
+					}
+				console.log('updated one item');
 				return done();
-			}
-			console.log('updated one item');
-			return done();
+			});
+		}
+		else
+		{
+			console.log('Not exists');
+			client.query(`INSERT into month${ISO.month} (tag,name,week${ISO.week}Given,week${ISO.week}Received)
+				VALUES ($1,$2,$3,$4); `
+			,[item.tag,item.name,item.donations,item.donationsReceived]
+			, (err,res) =>{
+				if(err){
+					console.log(err);
+					return done();
+				}
+				console.log('Inserted it');
+				return done();
+			});
+		}
 		});
-};
+	});
+}
 
 var updateRecords = (body)=>{
 	
