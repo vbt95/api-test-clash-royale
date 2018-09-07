@@ -120,7 +120,7 @@ var updateOne = (item,ISO) =>{
 						[item.donations,item.donationsReceived,item.tag]
 						,(err,res) =>{
 							if(err){
-								console.log(err);
+								console.log(JSON.stringify(err,undefined,2));
 								status = err;
 								done();
 							
@@ -139,7 +139,7 @@ var updateOne = (item,ISO) =>{
 							,[item.tag,item.name,item.donations,item.donationsReceived]
 							, (err,res) =>{
 									if(err){
-									console.log(err);
+									console.log(JSON.stringify(err,undefined,2));
 									done();
 									status = err;
 								}
