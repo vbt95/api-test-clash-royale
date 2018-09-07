@@ -58,13 +58,13 @@ var checkTable = (body) =>{
 	const ISO = getISOWeekInMonth(new Date());
 	//let flag=false;
 	client.query(`CREATE TABLE IF NOT EXISTS month${ISO.month} (tag varchar(20) PRIMARY KEY,
-	name var(30),
-	week1Given int DEFAULT 0,week1Received int DEFAULT 0, 
-	week2Given int DEFAULT 0,week2Received int DEFAULT 0, 
-	week3Given int DEFAULT 0,week3Received int DEFAULT 0,
-	week4Given int DEFAULT 0,week4Received int DEFAULT 0,
-	week5Given int DEFAULT 0, week5Received int DEFAULT 0,
-	totalDonationsGiven int DEFAULT 0, totalDonationsReceived int DEFAULT 0);`
+	name varchar(30),
+	week1Given integer DEFAULT 0,week1Received integer DEFAULT 0, 
+	week2Given integer DEFAULT 0,week2Received integer	DEFAULT 0, 
+	week3Given integer DEFAULT 0,week3Received integer DEFAULT 0,
+	week4Given integer DEFAULT 0,week4Received integer DEFAULT 0,
+	week5Given integer DEFAULT 0, week5Received integer DEFAULT 0,
+	totalDonationsGiven integer DEFAULT 0, totalDonationsReceived integer DEFAULT 0);`
 	, (err, res2) => {
 		if (err) return err;
 		//flag = true;
