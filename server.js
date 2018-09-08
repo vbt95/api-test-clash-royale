@@ -30,7 +30,7 @@ var options = {
 	method : 'GET',
 	url : 'https://api.royaleapi.com/clan/C2VQCU'
 	,headers : {
-		auth : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTYyOCwiaWRlbiI6IjI1NTcyODU2ODA2MTkxOTI0MyIsIm1kIjp7fSwidHMiOjE1MzYyMjc3MDE3MTh9.8tb3YdGuJxSDxZu_aO9aRSMSnwY1Y5st6srZqe3LyNg'
+		auth : process.env.API_KEY
 	}
 	, json : true
 
@@ -130,7 +130,7 @@ var updateFinal = (body,ISO,res) =>{
 								console.log('updated one item');
 								done();
 								if(index == totalMembers-1)
-									res.send('success');
+									res.render('success');
 							}
 					});// update query over
 				}
@@ -150,7 +150,7 @@ var updateFinal = (body,ISO,res) =>{
 									console.log('Inserted it');
 									done();
 									if(index== totalMembers-1)
-										res.send('success');
+										res.render('success');
 								}
 					});// insert query over
 				}
