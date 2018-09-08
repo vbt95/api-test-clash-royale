@@ -82,22 +82,20 @@ var checkTable = () =>{
 	});
 }
 
-var updateFinal = (body,ISO,res) =>{
+var updateFinal = (body,ISO,response) =>{
 	const totalMembers = body.members.length;
 	//body.members.forEach( (item,index) => {
 		
 	for(let index=0; index<totalMembers;index++){
 		
 		const item = body.members[index];
-		
+		if(response.headersSent)
+			continue;
 		pool.connect( (err,client,done) =>{
-		
-		if(res.headersSent)
-			return done();
 		if(err){
 			console.log(err);
 			done();
-			res.render('error',{message : err});
+			response.render('error',{message : err});
 		}
 		else{
 		client.query( `SELECT * FROM month${ISO.month} WHERE tag = $1;`
@@ -107,7 +105,7 @@ var updateFinal = (body,ISO,res) =>{
 			if(err){
 				console.log(err);
 				done();
-				res.render('error',{ message : err});
+				response.render('error',{ message : err});
 			}
 			else{
 		
@@ -124,13 +122,13 @@ var updateFinal = (body,ISO,res) =>{
 							if(err){
 								console.log(JSON.stringify(err,undefined,2));
 								done();
-								res.render('error', { message : err});
+								response.render('error', { message : err});
 							}
 							else{
 								console.log('updated one item');
 								done();
 								if(index == totalMembers-1)
-									res.render('success');
+									response.render('success');
 							}
 					});// update query over
 				}
@@ -144,13 +142,13 @@ var updateFinal = (body,ISO,res) =>{
 									if(err){
 									console.log(JSON.stringify(err,undefined,2));
 									done();
-									res.render('error',{ message: err});
+									response.render('error',{ message: err});
 								}
 								else{
 									console.log('Inserted it');
 									done();
 									if(index== totalMembers-1)
-										res.render('success');
+										response.render('success');
 								}
 					});// insert query over
 				}
@@ -228,6 +226,54 @@ app.get('/', (req,res) =>{
 	res.render('home',{} );
 });
 
+
+app.use('/testview',(req,res)=>{
+	res.render('view',{
+		 rows : [
+        {
+            "name": "Nicki Bey",
+            "tag": "Q8JGYLCY",
+            "rank": 1,
+            "previousRank": 1,
+            "role": "elder",
+            "expLevel": 13,
+            "trophies": 5817,
+            "clanChestCrowns": 47,
+            "donations": 0,
+            "donationsReceived": 360,
+            "donationsDelta": -360,
+            "donationsPercent": 0,
+            "arena": {
+                "name": "Champion",
+                "arena": "League 7",
+                "arenaID": 19,
+                "trophyLimit": 5800
+            }
+        },
+        {
+            "name": "John™",
+            "tag": "PL22YQUY",
+            "rank": 2,
+            "previousRank": 4,
+            "role": "elder",
+            "expLevel": 13,
+            "trophies": 5677,
+            "clanChestCrowns": 110,
+            "donations": 348,
+            "donationsReceived": 320,
+            "donationsDelta": 28,
+            "donationsPercent": 1.25,
+            "arena": {
+                "name": "Master III",
+                "arena": "League 6",
+                "arenaID": 18,
+                "trophyLimit": 5500
+            }
+        },
+		]
+	});
+	});
+
 // Error for any other non-supported page
 app.use((req,res,next) =>{
 	res.render('error',{message : 'Error 404! Page not found'});
@@ -238,3 +284,6 @@ app.use((req,res,next) =>{
 app.listen(port, () =>{
 	console.log(`Server is up at ${port}`);
 });
+
+
+
