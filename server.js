@@ -17,6 +17,9 @@ var app = express();
 // set view engine
 app.set('view engine','ejs');
 
+//set static resources
+app.use(express.static(__dirname+'/public'));
+
 // For maintenance mode
 /*app.use((req,res,next) =>{
 	res.render('maintenance');
@@ -79,16 +82,22 @@ var checkTable = () =>{
 	});
 }
 
-var updateFinal = (body,ISO) =>{
-	let status;
-	body.members.forEach( (item) => {
+var updateFinal = (body,ISO,res) =>{
+	const totalMembers = body.members.length;
+	//body.members.forEach( (item,index) => {
 		
-	pool.connect( (err,client,done) =>{
+	for(let index=0; index<totalMembers;index++){
 		
+		const item = body.members[index];
+		
+		pool.connect( (err,client,done) =>{
+		
+		if(res.headersSent)
+			return done();
 		if(err){
 			console.log(err);
-			status = err;
 			done();
+			res.render('error',{message : err});
 		}
 		else{
 		client.query( `SELECT * FROM month${ISO.month} WHERE tag = $1;`
@@ -97,8 +106,8 @@ var updateFinal = (body,ISO) =>{
 		
 			if(err){
 				console.log(err);
-				status = err;
 				done();
+				res.render('error',{ message : err});
 			}
 			else{
 		
@@ -114,13 +123,14 @@ var updateFinal = (body,ISO) =>{
 						,(err,res) =>{
 							if(err){
 								console.log(JSON.stringify(err,undefined,2));
-								status = err;
 								done();
-							
+								res.render('error', { message : err});
 							}
 							else{
 								console.log('updated one item');
 								done();
+								if(index == totalMembers-1)
+									res.send('success');
 							}
 					});// update query over
 				}
@@ -134,29 +144,27 @@ var updateFinal = (body,ISO) =>{
 									if(err){
 									console.log(JSON.stringify(err,undefined,2));
 									done();
-									status = err;
+									res.render('error',{ message: err});
 								}
 								else{
 									console.log('Inserted it');
 									done();
+									if(index== totalMembers-1)
+										res.send('success');
 								}
 					});// insert query over
 				}
 			}
 		});
-		}
-	});
-});
-return status;
+	};
+		});
+	}
 }
 
-var updateRecords = (body)=>{
+var updateRecords = (body,res)=>{
 	
 	const ISO = getISOWeekInMonth(new Date());
-	let status = updateFinal(body,ISO);
-	if(status){
-			return status;
-	}
+	updateFinal(body,ISO,res);
 };
 
 app.get('/update', (req,res) =>{
@@ -166,19 +174,12 @@ app.get('/update', (req,res) =>{
 	if(error)
 		res.render('error',{message : error});
 	else if(response.statusCode !== 200){
-		res.render('error', {message : response.statusCode});
+		res.render('error', {message : `Error! ${response.statusCode}`});
 	}
 	else{
 		//console.log(JSON.stringify(body,undefined,2));
-		
-		const statusUpdate = updateRecords(body);
-		if(statusUpdate){
-			res.render('error', {message : statusUpdate});
-			return;
-		}
-		res.send('Successfully updated');
+		updateRecords(body,res);
 	}
-	//res.send('done');
 });
 });
 
@@ -222,8 +223,6 @@ app.get('/view',(req,res) =>{
 	});
 });
 
-
-
 // Home page
 app.get('/', (req,res) =>{
 	res.render('home',{} );
@@ -231,8 +230,9 @@ app.get('/', (req,res) =>{
 
 // Error for any other non-supported page
 app.use((req,res,next) =>{
-	res.render('error',{message : 'Error 404! Not found page'});
+	res.render('error',{message : 'Error 404! Page not found'});
 });
+
 
 // start listening at port
 app.listen(port, () =>{
