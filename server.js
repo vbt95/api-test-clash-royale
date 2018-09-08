@@ -82,14 +82,7 @@ var checkTable = () =>{
 var updateFinal = (body,ISO) =>{
 	let status;
 	body.members.forEach( (item) => {
-	/*	let statusInsert = updateOne(item,ISO);
-		if(statusInsert)
-			return statusInsert;
-})
-};
-
-var updateOne = (item,ISO) =>{
-	let status;*/
+		
 	pool.connect( (err,client,done) =>{
 		
 		if(err){
