@@ -60,7 +60,8 @@ var checkTable = (response) =>{
 	pool.connect((err,client,done ) =>{
 	
 	if(err){
-		 throw err;
+		 response.render('error',{message : err});
+		 return;
 	}
 	client.query(`CREATE TABLE IF NOT EXISTS month${ISO.month} (tag varchar(20) PRIMARY KEY,
 	name varchar(30),
@@ -186,7 +187,7 @@ app.get('/update', (req,res) =>{
 });
 
 app.get('/setForCurrentMonth' ,(req,res) =>{
-	let status = checkTable(res);
+	checkTable(res);
 });
 
 // View current month records
